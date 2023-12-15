@@ -33,7 +33,7 @@ use \InitPHP\Logger\FileLogger;
 
 $logFile = __DIR__ . '/logfile.log';
 
-$logger = new Logger(new FileLogger($logFile));
+$logger = new Logger(new FileLogger(['path' => $logFile]));
 ```
 
 ### PdoLogger
@@ -46,7 +46,7 @@ use \InitPHP\Logger\PDOLogger;
 $table = 'logs';
 $pdo = new \PDO('mysql:dbname=project;host=localhost', 'root', '');
 
-$logger = new Logger(new PDOLogger($pdo, $table));
+$logger = new Logger(new PDOLogger(['pdo' => $pdo, 'table' => $table]));
 
 $logger->error('User {user} caused an error.', array('user' => 'muhametsafak'));
 // INSERT INTO logs (level, message, date) VALUES ('ERROR', 'User muhametsafak caused an error.', '2022-03-11 13:05:45')
@@ -75,7 +75,7 @@ $logFile = __DIR__ . '/logfile.log';
 $table = 'logs';
 $pdo = new \PDO('mysql:dbname=project;host=localhost', 'root', '');
 
-$logger = new Logger(new FileLogger($logFile), new PDOLogger($pdo, $table));
+$logger = new Logger(new FileLogger(['path' => $logFile]), new PDOLogger(['pdo' => $pdo, 'table' => $table]));
 ```
 
 ## Methods

@@ -30,11 +30,11 @@ class FileLogger extends \Psr\Log\AbstractLogger implements \Psr\Log\LoggerInter
     protected $path;
 
     /**
-     * @param string $path
+     * @param array $options
      */
-    public function __construct($path)
+    public function __construct(array $options = [])
     {
-        $this->path = $this->interpolate($path, array(
+        $this->path = $this->interpolate($options['path'], array(
             'year'      => date('Y'),
             'month'     => date('m'),
             'day'       => date('d'),

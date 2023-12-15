@@ -30,16 +30,19 @@ class PDOLogger extends \Psr\Log\AbstractLogger implements \Psr\Log\LoggerInterf
     /** @var string */
     protected $table;
 
-    public function __construct($pdo, $table)
+    /**
+     * @param array $options
+     */
+    public function __construct(array $options = [])
     {
-        if(!($pdo instanceof PDO)){
+        if(!($options['pdo'] instanceof PDO)){
             throw new \InvalidArgumentException('It must be a PDO object.');
         }
-        if(!is_string($table)){
+        if(!is_string($options['table'])){
             throw new \InvalidArgumentException('The name of the table where the logs will be kept must be specified as a string.');
         }
-        $this->pdo = $pdo;
-        $this->table = $table;
+        $this->pdo = $options['pdo'];
+        $this->table = $options['table'];
     }
 
     public function __destruct()
