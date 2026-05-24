@@ -1,50 +1,64 @@
 <?php
-/**
- * Logger.php
- *
- * This file is part of InitPHP.
- *
- * @author     Muhammet ŞAFAK <info@muhammetsafak.com.tr>
- * @copyright  Copyright © 2022 InitPHP
- * @license    http://initphp.github.io/license.txt  MIT
- * @version    1.0
- * @link       https://www.muhammetsafak.com.tr
- */
+
+declare(strict_types=1);
 
 namespace InitPHP\Logger;
 
-use \Psr\Log\LoggerInterface;
+use InvalidArgumentException;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
+use Stringable;
+
+use function array_values;
 
 /**
- * @method void emergency(string $message, array $context = array())
- * @method void alert(string $message, array $context = array())
- * @method void critical(string $message, array $context = array())
- * @method void error(string $message, array $context = array())
- * @method void warning(string $message, array $context = array())
- * @method void notice(string $message, array $context = array())
- * @method void info(string $message, array $context = array())
- * @method void debug(string $message, array $context = array())
- * @method void log(string $level, string $message, array $context = array())
+ * Fan-out multiplexer: forwards every PSR-3 call to a fixed set of inner loggers.
+ *
+ * Constructed with one or more {@see LoggerInterface} instances. Each `log()`
+ * (and, via {@see AbstractLogger}, each `emergency()`/`alert()`/.../`debug()`)
+ * call is dispatched to every inner logger in the order they were supplied.
+ *
+ * Exceptions thrown by an inner logger are *not* caught: PSR-3 requires
+ * `\Psr\Log\InvalidArgumentException` for unknown levels and otherwise mandates
+ * silent handling. Callers that need fault-tolerance across handlers should
+ * wrap individual handlers themselves.
  */
-class Logger
+final class Logger extends AbstractLogger
 {
-    /** @var LoggerInterface[] */
-    protected $loggers = [];
+    /** @var list<LoggerInterface> */
+    private array $loggers;
 
-    public function __construct(...$loggers)
+    /**
+     * @throws InvalidArgumentException If no logger is supplied.
+     */
+    public function __construct(LoggerInterface ...$loggers)
     {
-        foreach ($loggers as $log) {
-            if($log instanceof LoggerInterface){
-                $this->loggers[] = $log;
-            }
+        if ($loggers === []) {
+            throw new InvalidArgumentException(
+                'InitPHP\\Logger\\Logger requires at least one Psr\\Log\\LoggerInterface instance.'
+            );
         }
+        $this->loggers = array_values($loggers);
     }
 
-    public function __call($name, $arguments)
+    /**
+     * @param mixed $level
+     * @param array<string, mixed> $context
+     */
+    public function log($level, string|Stringable $message, array $context = []): void
     {
         foreach ($this->loggers as $logger) {
-            $logger->{$name}(...$arguments);
+            $logger->log($level, $message, $context);
         }
     }
 
+    /**
+     * Returns the inner loggers in the order they were registered.
+     *
+     * @return list<LoggerInterface>
+     */
+    public function getLoggers(): array
+    {
+        return $this->loggers;
+    }
 }

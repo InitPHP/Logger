@@ -1,143 +1,195 @@
 # InitPHP Logger
 
-Logger class in accordance with PSR-3 standards
+A small, focused, PSR-3 compliant logger for PHP 8.0+. Ships with two built-in
+handlers and a tiny multiplexer that fans every log record out to several
+handlers at once.
 
-[![Latest Stable Version](http://poser.pugx.org/initphp/logger/v)](https://packagist.org/packages/initphp/logger) [![Total Downloads](http://poser.pugx.org/initphp/logger/downloads)](https://packagist.org/packages/initphp/logger) [![Latest Unstable Version](http://poser.pugx.org/initphp/logger/v/unstable)](https://packagist.org/packages/initphp/logger) [![License](http://poser.pugx.org/initphp/logger/license)](https://packagist.org/packages/initphp/logger) [![PHP Version Require](http://poser.pugx.org/initphp/logger/require/php)](https://packagist.org/packages/initphp/logger)
+[![Latest Stable Version](https://poser.pugx.org/initphp/logger/v)](https://packagist.org/packages/initphp/logger)
+[![Total Downloads](https://poser.pugx.org/initphp/logger/downloads)](https://packagist.org/packages/initphp/logger)
+[![License](https://poser.pugx.org/initphp/logger/license)](https://packagist.org/packages/initphp/logger)
+[![PHP Version Require](https://poser.pugx.org/initphp/logger/require/php)](https://packagist.org/packages/initphp/logger)
 
-## Features
+## At a glance
 
-- Keeping logs to the database with PDO.
-- Printing log records to a file.
-- Logging feature with multiple drivers.
+- **`FileLogger`** — appends each record as a single line to a file, with
+  optional date-token placeholders in the path (`{year}/{month}/{day}/...`).
+- **`PDOLogger`** — inserts each record as a row in a relational table, using
+  prepared statements. Works with any PDO driver (MySQL, PostgreSQL, SQLite…).
+- **`Logger`** — accepts any number of `Psr\Log\LoggerInterface` instances and
+  forwards every call to all of them, in registration order.
+
+Everything implements `Psr\Log\LoggerInterface` (PSR-3 v3), so you can drop the
+package into any framework or library that consumes that contract — or compose
+it with handlers from other PSR-3 packages.
 
 ## Requirements
 
-- PHP 5.6 or higher
-- [PSR-3 Interface Package](https://www.php-fig.org/psr/psr-3/)
-- PDO Extension (Only `PDOLogger`)
+| Requirement | Version |
+| --- | --- |
+| PHP | `>= 8.0` |
+| [`psr/log`](https://packagist.org/packages/psr/log) | `^3.0` |
+| `ext-pdo` | Required only for `PDOLogger` |
 
 ## Installation
 
-```
+```bash
 composer require initphp/logger
 ```
 
-## Using
+## Quick start
+
+```php
+require __DIR__ . '/vendor/autoload.php';
+
+use InitPHP\Logger\FileLogger;
+use InitPHP\Logger\Logger;
+
+$logger = new Logger(
+    new FileLogger(['path' => __DIR__ . '/logs/app.log'])
+);
+
+$logger->info('Service booted in {ms}ms', ['ms' => 42]);
+$logger->error('Payment {id} failed', ['id' => 9182]);
+```
+
+Produces, for example:
+
+```
+2026-05-24T14:08:22+03:00 [INFO] Service booted in 42ms
+2026-05-24T14:08:22+03:00 [ERROR] Payment 9182 failed
+```
+
+## Handlers
 
 ### FileLogger
 
-```php 
-require_once "vendor/autoload.php";
-use \InitPHP\Logger\Logger;
-use \InitPHP\Logger\FileLogger;
+```php
+use InitPHP\Logger\FileLogger;
 
-$logFile = __DIR__ . '/logfile.log';
-
-$logger = new Logger(new FileLogger(['path' => $logFile]));
+$logger = new FileLogger([
+    'path' => __DIR__ . '/logs/app-{year}-{month}-{day}.log',
+]);
 ```
 
-### PdoLogger
+Path tokens (`{year}`, `{month}`, `{day}`, `{hour}`, `{minute}`, `{second}`) are
+resolved once, at construction time, against the process clock. The parent
+directory is created automatically (mode `0775`) if it does not already exist.
+Writes use `FILE_APPEND | LOCK_EX`, so concurrent processes do not interleave
+bytes within a single record.
 
-```php 
-require_once "vendor/autoload.php";
-use \InitPHP\Logger\Logger;
-use \InitPHP\Logger\PDOLogger;
+Full reference: [`docs/02-file-logger.md`](docs/02-file-logger.md).
 
-$table = 'logs';
-$pdo = new \PDO('mysql:dbname=project;host=localhost', 'root', '');
+### PDOLogger
 
-$logger = new Logger(new PDOLogger(['pdo' => $pdo, 'table' => $table]));
+```php
+use InitPHP\Logger\PDOLogger;
 
-$logger->error('User {user} caused an error.', array('user' => 'muhametsafak'));
-// INSERT INTO logs (level, message, date) VALUES ('ERROR', 'User muhametsafak caused an error.', '2022-03-11 13:05:45')
+$pdo = new PDO('mysql:host=localhost;dbname=app;charset=utf8mb4', 'app', 'secret');
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$logger = new PDOLogger(['pdo' => $pdo, 'table' => 'logs']);
+
+$logger->error('User {user} caused an error.', ['user' => 'muhammetsafak']);
+// INSERT INTO logs (level, message, date) VALUES ('ERROR', 'User muhammetsafak caused an error.', '2026-05-24 14:08:22')
 ```
 
-You can use the following SQL statement to create a sample MySQL table.
+Reference DDL for MySQL:
 
-```sql 
+```sql
 CREATE TABLE `logs` (
-    `level` ENUM('EMERGENCY','ALERT','CRITICAL','ERROR','WARNING','NOTICE','INFO','DEBUG') NOT NULL,
+    `id`      BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `level`   ENUM('EMERGENCY','ALERT','CRITICAL','ERROR','WARNING','NOTICE','INFO','DEBUG') NOT NULL,
     `message` TEXT NOT NULL,
-    `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
+    `date`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY `idx_logs_level_date` (`level`, `date`)
+) ENGINE = InnoDB CHARSET = utf8mb4 COLLATE utf8mb4_general_ci;
 ```
 
-### Multi Logger
+PostgreSQL and SQLite variants are documented in
+[`docs/03-pdo-logger.md`](docs/03-pdo-logger.md).
 
-```php 
-require_once "vendor/autoload.php";
-use \InitPHP\Logger\Logger;
-use \InitPHP\Logger\PDOLogger;
-use \InitPHP\Logger\FileLogger;
-
-$logFile = __DIR__ . '/logfile.log';
-
-$table = 'logs';
-$pdo = new \PDO('mysql:dbname=project;host=localhost', 'root', '');
-
-$logger = new Logger(new FileLogger(['path' => $logFile]), new PDOLogger(['pdo' => $pdo, 'table' => $table]));
-```
-
-## Methods
+### Multi-handler logging
 
 ```php
-public function emergency(string $msg, array $context = array()): void;
+use InitPHP\Logger\FileLogger;
+use InitPHP\Logger\Logger;
+use InitPHP\Logger\PDOLogger;
 
-public function alert(string $msg, array $context = array()): void;
+$logger = new Logger(
+    new FileLogger(['path' => __DIR__ . '/logs/app.log']),
+    new PDOLogger(['pdo' => $pdo, 'table' => 'logs'])
+);
 
-public function critical(string $msg, array $context = array()): void;
-
-public function error(string $msg, array $context = array()): void;
-
-public function warning(string $msg, array $context = array()): void;
-
-public function notice(string $msg, array $context = array()): void;
-
-public function info(string $msg, array $context = array()): void;
-
-public function debug(string $msg, array $context = array()): void;
-
-public function log(string $level, string $msg, array $context = array()): void;
+$logger->warning('cache miss for key {key}', ['key' => 'user:42']);
+// Goes to BOTH the file and the database table.
 ```
 
-All of the above methods are used the same way, except for the `log()` method. You can use the `log()` method for your own custom error levels.
+`Logger` accepts any `Psr\Log\LoggerInterface`, including handlers from other
+PSR-3 packages — see [`docs/05-custom-handlers.md`](docs/05-custom-handlers.md).
 
-**Example 1 :**
+## PSR-3 surface
+
+Every handler exposes the full PSR-3 API:
 
 ```php
-$logger->emergency("Something went wrong");
+$logger->emergency(string|\Stringable $message, array $context = []): void;
+$logger->alert    (string|\Stringable $message, array $context = []): void;
+$logger->critical (string|\Stringable $message, array $context = []): void;
+$logger->error    (string|\Stringable $message, array $context = []): void;
+$logger->warning  (string|\Stringable $message, array $context = []): void;
+$logger->notice   (string|\Stringable $message, array $context = []): void;
+$logger->info     (string|\Stringable $message, array $context = []): void;
+$logger->debug    (string|\Stringable $message, array $context = []): void;
+$logger->log      ($level, string|\Stringable $message, array $context = []): void;
 ```
 
-It prints an output like this to the log file.
+Context placeholders (`{name}`) are expanded with the matching key from
+`$context`. Booleans render as `true` / `false`, `null` renders as the empty
+string, `\Throwable` values render as `Class(code): message in file:line`,
+and anything implementing `__toString()` is cast to string. Arrays and
+non-stringable objects are skipped — see
+[`docs/06-psr3-context.md`](docs/06-psr3-context.md).
 
+Unknown log levels throw `Psr\Log\InvalidArgumentException`, per PSR-3 §1.1.
+
+## Documentation
+
+Topic-by-topic guides live in [`docs/`](docs/):
+
+- [`01-getting-started.md`](docs/01-getting-started.md)
+- [`02-file-logger.md`](docs/02-file-logger.md)
+- [`03-pdo-logger.md`](docs/03-pdo-logger.md)
+- [`04-multi-logger.md`](docs/04-multi-logger.md)
+- [`05-custom-handlers.md`](docs/05-custom-handlers.md)
+- [`06-psr3-context.md`](docs/06-psr3-context.md)
+- [`07-recipes.md`](docs/07-recipes.md)
+- [`08-testing-your-logging.md`](docs/08-testing-your-logging.md)
+
+## Testing the package itself
+
+```bash
+composer install
+composer test         # PHPUnit
+composer phpstan      # PHPStan (level max)
+composer cs-check     # PHP-CS-Fixer dry-run
+composer ci           # all of the above
 ```
-2021-09-29T13:34:47+02:00 [EMERGENCY] Something went wrong
-```
 
-**Example 2:**
+## Contributing
 
-```php
-$logger->error("User {username} caused an error.", ["username" => "john"]);
-```
+Please read the org-wide
+[`CONTRIBUTING.md`](https://github.com/InitPHP/.github/blob/main/CONTRIBUTING.md)
+before opening a pull request. Bug reports and feature ideas go through
+[Issues](https://github.com/InitPHP/Logger/issues) and
+[Discussions](https://github.com/orgs/InitPHP/discussions).
 
-It prints an output like this to the log file.
+## Security
 
-```
-2021-09-29T13:34:47+02:00 [ERROR] User john caused an error.
-```
-
-That is all.
-
-***
-
-## Getting Help
-
-If you have questions, concerns, bug reports, etc, please file an issue in this repository's Issue Tracker.
-
-## Credits
-
-- [Muhammet ŞAFAK](https://www.muhammetsafak.com.tr)
+If you discover a security vulnerability, please follow the instructions in the
+org-wide
+[`SECURITY.md`](https://github.com/InitPHP/.github/blob/main/SECURITY.md). Do
+**not** open a public issue.
 
 ## License
 
-Copyright &copy; 2022 [MIT License](./LICENSE)
+Released under the [MIT License](LICENSE). Copyright © InitPHP.
