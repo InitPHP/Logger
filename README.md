@@ -4,6 +4,7 @@ A small, focused, PSR-3 compliant logger for PHP 8.0+. Ships with two built-in
 handlers and a tiny multiplexer that fans every log record out to several
 handlers at once.
 
+[![Designed & Maintained with Tan](https://www.muhammetsafak.com.tr/badges/designed-maintained-with-tan.svg)](https://www.muhammetsafak.com.tr/en/tan/)
 [![Latest Stable Version](https://poser.pugx.org/initphp/logger/v)](https://packagist.org/packages/initphp/logger)
 [![Total Downloads](https://poser.pugx.org/initphp/logger/downloads)](https://packagist.org/packages/initphp/logger)
 [![License](https://poser.pugx.org/initphp/logger/license)](https://packagist.org/packages/initphp/logger)
