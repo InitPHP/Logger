@@ -20,13 +20,13 @@ final class PDOLoggerTest extends TestCase
         $this->pdo = new PDO('sqlite::memory:');
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->exec(<<<'SQL'
-            CREATE TABLE logs (
-                id      INTEGER PRIMARY KEY AUTOINCREMENT,
-                level   TEXT NOT NULL,
-                message TEXT NOT NULL,
-                date    TEXT NOT NULL
-            )
-        SQL);
+                CREATE TABLE logs (
+                    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                    level   TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    date    TEXT NOT NULL
+                )
+            SQL);
     }
 
     public function testConstructorThrowsWhenPdoMissing(): void

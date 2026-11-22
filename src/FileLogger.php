@@ -59,7 +59,7 @@ class FileLogger extends AbstractLogger
     {
         if (!isset($options['path']) || !is_string($options['path']) || $options['path'] === '') {
             throw new InvalidArgumentException(
-                'FileLogger requires a non-empty string "path" option.'
+                'FileLogger requires a non-empty string "path" option.',
             );
         }
 
@@ -116,7 +116,7 @@ class FileLogger extends AbstractLogger
         if ($dir === '' || $dir === '.' || is_dir($dir)) {
             return;
         }
-        if (!@mkdir($dir, 0775, true) && !is_dir($dir)) {
+        if (!@mkdir($dir, 0o775, true) && !is_dir($dir)) {
             error_log(sprintf('InitPHP\\Logger\\FileLogger: failed to create directory "%s".', $dir));
         }
     }

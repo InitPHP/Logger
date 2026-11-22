@@ -63,7 +63,7 @@ final class FileLoggerTest extends TestCase
         $this->assertSame(1, substr_count($contents, PHP_EOL));
         $this->assertMatchesRegularExpression(
             '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+\-]\d{2}:\d{2} \[INFO\] hello world\r?\n$/',
-            $contents
+            $contents,
         );
     }
 
@@ -112,7 +112,7 @@ final class FileLoggerTest extends TestCase
         $path = $this->tempDir . '/app.log';
         $logger = new FileLogger(['path' => $path]);
 
-        $stringable = new class () implements \Stringable {
+        $stringable = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'STR';

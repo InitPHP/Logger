@@ -20,7 +20,7 @@ final class HelperTraitTest extends TestCase
      */
     private function helper(): object
     {
-        $instance = new class () {
+        $instance = new class {
             use HelperTrait {
                 interpolate as public publicInterpolate;
                 logLevelVerify as public publicVerify;
@@ -45,7 +45,7 @@ final class HelperTraitTest extends TestCase
     {
         $h = $this->helper();
 
-        $stringable = new class () implements \Stringable {
+        $stringable = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'S';
@@ -92,7 +92,7 @@ final class HelperTraitTest extends TestCase
     public function testInterpolateAcceptsStringableMessage(): void
     {
         $h = $this->helper();
-        $msg = new class () implements \Stringable {
+        $msg = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'hello {name}';
@@ -117,7 +117,7 @@ final class HelperTraitTest extends TestCase
         $value = ($h->date)();
         $this->assertMatchesRegularExpression(
             '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+\-]\d{2}:\d{2}$/',
-            $value
+            $value,
         );
     }
 

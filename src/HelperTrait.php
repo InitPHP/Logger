@@ -116,7 +116,7 @@ trait HelperTrait
             throw new InvalidArgumentException(sprintf(
                 'Unknown log level "%s". Allowed PSR-3 levels are: %s.',
                 is_string($level) ? $level : get_debug_type($level),
-                implode(', ', $this->levels)
+                implode(', ', $this->levels),
             ));
         }
     }
@@ -142,7 +142,7 @@ trait HelperTrait
                 $value->getCode(),
                 $value->getMessage(),
                 $value->getFile(),
-                $value->getLine()
+                $value->getLine(),
             );
         }
         if ($value instanceof Stringable) {
