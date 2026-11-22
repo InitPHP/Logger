@@ -78,7 +78,7 @@ directory is created automatically (mode `0775`) if it does not already exist.
 Writes use `FILE_APPEND | LOCK_EX`, so concurrent processes do not interleave
 bytes within a single record.
 
-Full reference: [`docs/02-file-logger.md`](docs/02-file-logger.md).
+Full reference: [`docs/File-Logger.md`](docs/File-Logger.md).
 
 ### PDOLogger
 
@@ -107,7 +107,7 @@ CREATE TABLE `logs` (
 ```
 
 PostgreSQL and SQLite variants are documented in
-[`docs/03-pdo-logger.md`](docs/03-pdo-logger.md).
+[`docs/PDO-Logger.md`](docs/PDO-Logger.md).
 
 ### Multi-handler logging
 
@@ -126,7 +126,7 @@ $logger->warning('cache miss for key {key}', ['key' => 'user:42']);
 ```
 
 `Logger` accepts any `Psr\Log\LoggerInterface`, including handlers from other
-PSR-3 packages — see [`docs/05-custom-handlers.md`](docs/05-custom-handlers.md).
+PSR-3 packages — see [`docs/Custom-Handlers.md`](docs/Custom-Handlers.md).
 
 ## PSR-3 surface
 
@@ -149,7 +149,7 @@ Context placeholders (`{name}`) are expanded with the matching key from
 string, `\Throwable` values render as `Class(code): message in file:line`,
 and anything implementing `__toString()` is cast to string. Arrays and
 non-stringable objects are skipped — see
-[`docs/06-psr3-context.md`](docs/06-psr3-context.md).
+[`docs/Context-Interpolation.md`](docs/Context-Interpolation.md).
 
 Unknown log levels throw `Psr\Log\InvalidArgumentException`, per PSR-3 §1.1.
 
@@ -157,14 +157,22 @@ Unknown log levels throw `Psr\Log\InvalidArgumentException`, per PSR-3 §1.1.
 
 Topic-by-topic guides live in [`docs/`](docs/):
 
-- [`01-getting-started.md`](docs/01-getting-started.md)
-- [`02-file-logger.md`](docs/02-file-logger.md)
-- [`03-pdo-logger.md`](docs/03-pdo-logger.md)
-- [`04-multi-logger.md`](docs/04-multi-logger.md)
-- [`05-custom-handlers.md`](docs/05-custom-handlers.md)
-- [`06-psr3-context.md`](docs/06-psr3-context.md)
-- [`07-recipes.md`](docs/07-recipes.md)
-- [`08-testing-your-logging.md`](docs/08-testing-your-logging.md)
+- [`Home.md`](docs/Home.md)
+- [`Installation.md`](docs/Installation.md)
+- [`Quick-Start.md`](docs/Quick-Start.md)
+- [`File-Logger.md`](docs/File-Logger.md)
+- [`PDO-Logger.md`](docs/PDO-Logger.md)
+- [`Multi-Logger.md`](docs/Multi-Logger.md)
+- [`Custom-Handlers.md`](docs/Custom-Handlers.md)
+- [`Context-Interpolation.md`](docs/Context-Interpolation.md)
+- [`Recipes.md`](docs/Recipes.md)
+- [`Testing-Your-Logging.md`](docs/Testing-Your-Logging.md)
+- [`PSR-3-Compliance.md`](docs/PSR-3-Compliance.md)
+- [`Error-Handling.md`](docs/Error-Handling.md)
+- [`Troubleshooting.md`](docs/Troubleshooting.md)
+- [`API-Reference.md`](docs/API-Reference.md)
+- [`Migration-Guide.md`](docs/Migration-Guide.md)
+- [`FAQ.md`](docs/FAQ.md)
 
 ## Testing the package itself
 
