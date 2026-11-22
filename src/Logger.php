@@ -35,7 +35,7 @@ final class Logger extends AbstractLogger
     {
         if ($loggers === []) {
             throw new InvalidArgumentException(
-                'InitPHP\\Logger\\Logger requires at least one Psr\\Log\\LoggerInterface instance.'
+                'InitPHP\\Logger\\Logger requires at least one Psr\\Log\\LoggerInterface instance.',
             );
         }
         $this->loggers = array_values($loggers);

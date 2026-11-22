@@ -64,7 +64,7 @@ class PDOLogger extends AbstractLogger
             throw new InvalidArgumentException(sprintf(
                 'PDOLogger "table" option "%s" is not a valid SQL identifier; expected %s.',
                 $options['table'],
-                self::TABLE_NAME_PATTERN
+                self::TABLE_NAME_PATTERN,
             ));
         }
 
@@ -84,7 +84,7 @@ class PDOLogger extends AbstractLogger
 
         $statement = $this->pdo->prepare(sprintf(
             'INSERT INTO %s (level, message, date) VALUES (?, ?, ?)',
-            $this->table
+            $this->table,
         ));
 
         $statement->execute([

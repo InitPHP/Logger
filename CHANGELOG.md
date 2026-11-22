@@ -36,6 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Breaking: minimum PHP version raised to 8.2** (was 8.0); `composer.json`
+  now requires `php: ^8.2` and the CI matrix covers PHP 8.2, 8.3, 8.4 and 8.5.
+- Code style moved to PER-CS (php-cs-fixer, shared `.php-cs-fixer.dist.php`);
+  the codebase has been reformatted accordingly.
 - **Minimum PHP version raised to 8.0** (was 5.6). PHP 8.0+ is required for
   PSR-3 v3 anyway.
 - **`psr/log` constraint bumped to `^3.0`** (was the pinned `1.1.4`).

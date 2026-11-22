@@ -1,6 +1,6 @@
 # InitPHP Logger
 
-A small, focused, PSR-3 compliant logger for PHP 8.0+. Ships with two built-in
+A small, focused, PSR-3 compliant logger for PHP 8.2+. Ships with two built-in
 handlers and a tiny multiplexer that fans every log record out to several
 handlers at once.
 
@@ -27,7 +27,7 @@ it with handlers from other PSR-3 packages.
 
 | Requirement | Version |
 | --- | --- |
-| PHP | `>= 8.0` |
+| PHP | `>= 8.2` |
 | [`psr/log`](https://packagist.org/packages/psr/log) | `^3.0` |
 | `ext-pdo` | Required only for `PDOLogger` |
 
