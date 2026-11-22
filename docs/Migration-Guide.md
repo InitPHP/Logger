@@ -3,7 +3,7 @@
 This page lists every breaking change between releases and the exact steps
 to update.
 
-## From 2.0.x → current `main` (unreleased)
+## From 2.0.x → 3.0.0
 
 | Before | After |
 | --- | --- |
@@ -136,7 +136,7 @@ generic `log()` method work the same way.
 
 ### Diff-friendly upgrade checklist
 
-- [ ] `composer.json` — bump the PHP requirement if needed (`>=8.0` for 2.0.0; `^8.2` for the current `main`).
+- [ ] `composer.json` — bump the PHP requirement if needed (`>=8.0` for 2.0.0; `^8.2` for 3.0.0).
 - [ ] Resolve any transitive `psr/log` v1 conflicts (`composer why psr/log`).
 - [ ] Remove any code that called undocumented dynamic methods on `Logger`.
 - [ ] Replace any `extends Logger` with composition (`Logger` is `final`).

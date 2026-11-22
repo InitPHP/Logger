@@ -2,7 +2,7 @@
 
 Authoritative reference for every public class member shipped by
 `initphp/logger`. Method signatures are reproduced verbatim from the
-source; behavioural details correspond to the current `main` branch.
+source; behavioural details correspond to version 3.0.0.
 
 | Class | Namespace | Extends / Implements |
 | --- | --- | --- |

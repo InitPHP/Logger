@@ -19,7 +19,7 @@ use function strtoupper;
  *
  * The target table is expected to expose at least the columns `level`, `message`
  * and `date`. A reference MySQL DDL is published in the package README; SQLite
- * and PostgreSQL equivalents live in `docs/03-pdo-logger.md`.
+ * and PostgreSQL equivalents live in `docs/PDO-Logger.md`.
  *
  * Values are bound through prepared statements, so the `message` payload is safe
  * against SQL injection. The table identifier itself is validated against the
