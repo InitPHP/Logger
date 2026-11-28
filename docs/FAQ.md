@@ -26,7 +26,7 @@ an `InitPHP\Logger\Logger`, or vice versa.
 
 Yes. It is small, tested ([`tests/`](https://github.com/InitPHP/Logger/tree/main/tests))
 with PHPUnit, statically analysed at PHPStan level `max`, and CI-tested on
-PHP 8.2 through 8.5. The handlers are the same kind of code countless
+PHP 8.2 through 8.6. The handlers are the same kind of code countless
 applications run in production already.
 
 ### What's the licence?
